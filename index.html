@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Split & Share 💸</title>
+    <style>
+        :root { --primary: #25D366; --secondary: #128C7E; --bg: #fdfdfd; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #ece5dd; display: flex; justify-content: center; padding: 20px; }
+        .card { background: white; padding: 25px; border-radius: 20px; box-shadow: 0 8px 30px rgba(0,0,0,0.15); width: 100%; max-width: 450px; border-top: 8px solid var(--primary); }
+        h2 { color: #075e54; text-align: center; margin-bottom: 20px; }
+        .input-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: 600; color: #444; }
+        input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; font-size: 16px; }
+        .btn-add { background: var(--secondary); color: white; border: none; padding: 10px 15px; border-radius: 10px; cursor: pointer; font-weight: bold; }
+        #friendList { list-style: none; padding: 0; margin-top: 15px; }
+        .friend-item { background: #f0f0f0; padding: 10px; border-radius: 8px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+        .del-btn { color: #e74c3c; cursor: pointer; font-weight: bold; border: none; background: none; }
+        .btn-calc { background: #34b7f1; color: white; border: none; padding: 15px; border-radius: 10px; cursor: pointer; width: 100%; margin-top: 20px; font-size: 16px; font-weight: bold; }
+        .btn-wa { background: var(--primary); color: white; border: none; padding: 12px; border-radius: 10px; cursor: pointer; width: 100%; margin-top: 10px; display: none; font-weight: bold; text-align: center; text-decoration: none; }
+        #result { margin-top: 20px; padding: 15px; background: #dcf8c6; border-radius: 10px; display: none; text-align: center; line-height: 1.6; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2>Split & Share 💸</h2>
+    
+    <div class="input-group">
+        <label>Total Bill Amount (₹)</label>
+        <input type="number" id="billAmount" placeholder="e.g. 1500">
+    </div>
+
+    <div class="input-group">
+        <label>Dost ka Naam Likhein</label>
+        <div style="display: flex; gap: 8px;">
+            <input type="text" id="friendName" placeholder="Name enter karein">
+            <button class="btn-add" onclick="addFriend()">Add</button>
+        </div>
+    </div>
+
+    <ul id="friendList"></ul>
+    
+    <button class="btn-calc" onclick="calculate()">Hisaab Karein ✨</button>
+    
+    <div id="result"></div>
+    <a id="waButton" class="btn-wa" href="#" target="_blank">WhatsApp par bhejein 📲</a>
+</div>
+
+<script>
+    let friends = [];
+
+    function addFriend() {
+        const nameInput = document.getElementById('friendName');
+        const name = nameInput.value.trim();
+        if (name) {
+            friends.push(name);
+            renderList();
+            nameInput.value = '';
+        }
+    }
+
+    function removeFriend(index) {
+        friends.splice(index, 1);
+        renderList();
+    }
+
+    function renderList() {
+        const list = document.getElementById('friendList');
+        list.innerHTML = friends.map((f, i) => `
+            <li class="friend-item">
+                ${f} <button class="del-btn" onclick="removeFriend(${i})">✖</button>
+            </li>
+        `).join('');
+    }
+
+    function calculate() {
+        const amount = document.getElementById('billAmount').value;
+        const resultDiv = document.getElementById('result');
+        const waBtn = document.getElementById('waButton');
+
+        if (amount > 0 && friends.length > 0) {
+            const perPerson = (amount / (friends.length + 1)).toFixed(2); // +1 including user
+            const summary = `Total: ₹${amount}\nLog: ${friends.length + 1}\nHar kisi ko ₹${perPerson} dene hain.`;
+            
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = `<strong>Final Split:</strong><br>Aap + ${friends.join(', ')}<br>Total Log: ${friends.length + 1}<br>Hisaab: <b>₹${perPerson} each</b>`;
+            
+            // WhatsApp Link
+            const waMsg = encodeURIComponent("Hisaab ho gaya! ✅\n" + summary);
+            waBtn.href = `https://wa.me/?text=${waMsg}`;
+            waBtn.style.display = 'block';
+        } else {
+            alert("Bill bhariye aur doston ko add kariye!");
+        }
+    }
+</script>
+
+</body>
+</html>
